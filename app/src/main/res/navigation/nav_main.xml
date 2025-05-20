@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_main"
+    app:startDestination="@id/feedFragment">
+
+    <!-- FeedFragment -->
+    <fragment
+        android:id="@+id/feedFragment"
+        android:name="ru.netology.nmedia.activities.FeedFragment"
+        android:label="Feed"
+        tools:layout="@layout/fragment_feed">
+
+        <!-- Переход к NewPostFragment -->
+        <action
+            android:id="@+id/action_feedFragment_to_newPostFragment"
+            app:destination="@id/newPostFragment">
+            <argument
+                android:name="content"
+                app:argType="string"
+                app:nullable="true"
+                android:defaultValue="@null" />
+            <argument
+                android:name="videoLink"
+                app:argType="string"
+                app:nullable="true"
+                android:defaultValue="@null" />
+        </action>
+
+        <!-- Переход к CurrentPostFragment -->
+        <action
+            android:id="@+id/action_feedFragment_to_currentPostFragment"
+            app:destination="@id/currentPostFragment">
+            <argument
+                android:name="postId"
+                app:argType="long" />
+        </action>
+    </fragment>
+
+    <!-- NewPostFragment -->
+    <fragment
+        android:id="@+id/newPostFragment"
+        android:name="ru.netology.nmedia.activities.NewPostFragment"
+        android:label="New Post"
+        tools:layout="@layout/fragment_new_post">
+        <argument
+            android:name="content"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="videoLink"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
+
+    <!-- CurrentPostFragment -->
+    <fragment
+        android:id="@+id/currentPostFragment"
+        android:name="ru.netology.nmedia.activities.CurrentPostFragment"
+        android:label="Post Details"
+        tools:layout="@layout/fragment_current_post">
+        <argument
+            android:name="postId"
+            app:argType="long" />
+
+        <!-- Переход к NewPostFragment -->
+        <action
+            android:id="@+id/action_currentPostFragment_to_newPostFragment"
+            app:destination="@id/newPostFragment">
+            <argument
+                android:name="content"
+                app:argType="string"
+                app:nullable="true"
+                android:defaultValue="@null" />
+            <argument
+                android:name="videoLink"
+                app:argType="string"
+                app:nullable="true"
+                android:defaultValue="@null" />
+        </action>
+    </fragment>
+</navigation>

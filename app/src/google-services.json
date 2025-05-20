@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "522560642404",
+    "project_id": "nmrdia",
+    "storage_bucket": "nmrdia.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:522560642404:android:4de1e713d3d7512e5e2e71",
+        "android_client_info": {
+          "package_name": "nmedia.ru"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsC0r8WNxGeBzaeBc3_LMaIAVNO8tO9xw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:522560642404:android:728e551aa25c6f395e2e71",
+        "android_client_info": {
+          "package_name": "ru.netology.nmedia"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsC0r8WNxGeBzaeBc3_LMaIAVNO8tO9xw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

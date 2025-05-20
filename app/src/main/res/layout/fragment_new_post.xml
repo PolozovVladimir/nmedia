@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:padding="@dimen/common_spacing"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.NewPostFragment">
+
+
+
+    <TableRow>
+        <EditText
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:inputType="textMultiLine"
+            android:hint="@string/post_input_text"
+            android:importantForAutofill="no"
+            android:layout_weight="5"
+            />
+        <ImageView
+            android:id="@+id/attachBtn"
+            android:layout_marginTop="@dimen/small_spacing"
+            android:src="@drawable/ic_baseline_attach_file_24"
+            app:icon="@drawable/ic_baseline_attach_file_24"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:layout_weight="1"
+            />
+    </TableRow>
+
+    <TableRow>
+
+        <EditText
+            android:id="@+id/videoLink"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:hint="@string/input_video_link_here"
+            />
+
+    </TableRow>
+
+
+
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat = "@drawable/ic_baseline_done_24"
+        android:layout_gravity="end"
+        android:layout_margin="@dimen/common_spacing"/>
+
+</TableLayout>

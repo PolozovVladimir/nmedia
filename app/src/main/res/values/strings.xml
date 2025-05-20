@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Nmedia</string>
+    <string name="nmedia">NMedia!</string>
+    <string name="countOfLikes" translatable="false">10</string>
+    <string name="countOfShares" translatable="false">5</string>
+    <string name="countOfViews" translatable="false">5</string>
+    <string name="dotsimage" translatable="false">dotsImage</string>
+    <string name="favicon" translatable="false">favIcon</string>
+    <string name="shareicon" translatable="false">shareIcon</string>
+    <string name="eyeicon" translatable="false">eyeIcon</string>
+    <string name="avatarimage" translatable="false">avatarImage</string>
+    <string name="description_post_author_avatar" translatable="false">Post author avatar</string>
+    <string name="description_post_menu" translatable="false">Post menu</string>
+    <string name="description_post_like" translatable="false">Like</string>
+    <string name="description_post_share" translatable="false">Share</string>
+    <string name="post_menu_remove">Remove</string>
+    <string name="post_input_text">Post text</string>
+    <string name="post_menu_edit">Edit</string>
+    <string name="Me">Me</string>
+    <string name="now">now</string>
+    <string name="PostIsBlank">Post is blank</string>
+    <string name="chooser_share_post" translatable="false">Share</string>
+    <string name="input_video_link_here">input video link here</string>
+    <string name="channel_remote_name" translatable="false">Server notifications</string>
+    <string name="channel_remote_description" translatable="false">Notifications from remote server</string>
+    <string name="notification_user_liked" >%1$s liked %2$s\'s post</string>
+    <string name="notification_new_post">%1$s published new post</string>
+
+</resources>
