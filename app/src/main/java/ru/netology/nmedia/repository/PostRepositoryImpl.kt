@@ -10,10 +10,9 @@ class PostRepositoryImpl(
     private val dao: PostDao
 ) : PostRepository {
 
-    override fun getAll(): LiveData<List<Post>> =
-        dao.getAll().map { list ->
-            list.map { it.toDto() }
-        }
+    override fun getAll(): List<Post>  {
+        TODO()
+    }
 
     override fun likeById(id: Long) = dao.likedById(id)
     override fun shareById(id: Long) = dao.shareById(id)

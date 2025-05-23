@@ -27,8 +27,14 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            manifestPlaceholders.usesCleartextTraffic = false
         }
+        debug(
+                manifestPlaceholders.usesCleartextTraffic = true
+        )
+
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
@@ -44,8 +50,9 @@ dependencies {
     def gson_version = "2.10.1"
     def nav_version = "2.7.7"
     def room_ver = "2.6.1"
+    def okhttp_version = "4.9.3"
     def play_services_base_version = "18.2.0"
-
+    implementation "com.squareup.okhttp3:okhttp:$room_ver"
     implementation "androidx.room:room-runtime:$room_ver"
     implementation "androidx.room:room-ktx:$room_ver"
     kapt "androidx.room:room-compiler:$room_ver"
@@ -72,4 +79,5 @@ dependencies {
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
 }
