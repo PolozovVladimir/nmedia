@@ -7,6 +7,7 @@ import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.entity.PostEntity
 
+/*
 class PostRepositorySQLiteImpl(
     private val dao: PostDao
 ) : PostRepository {
@@ -28,11 +29,11 @@ class PostRepositorySQLiteImpl(
     }
 
     override fun shareById(id: Long) {
-        TODO("Not yet implemented")
+
     }
 
     override fun removeById(id: Long) {
         dao.removeById(id)
 
     }
-}
+*/

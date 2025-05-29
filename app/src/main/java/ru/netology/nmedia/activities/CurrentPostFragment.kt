@@ -19,7 +19,7 @@ import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.viewmodel.PostViewModel
 class CurrentPostFragment: Fragment(){
 
-    val viewModel: PostViewModel by viewModels(
+   /* val viewModel: PostViewModel by viewModels(
         ownerProducer = ::requireParentFragment
     )
 
@@ -90,4 +90,4 @@ class CurrentPostFragment: Fragment(){
         return binding.root
     }
 
-}
+*/}

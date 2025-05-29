@@ -18,16 +18,9 @@ import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 class NewPostFragment : Fragment() {
-
-
     companion object {
         var Bundle.textArg: String? by StringArg
-        const val TEXT_ARG = "textArg"
     }
-
-    val args by navArgs<NewPostFragmentArgs>()
-
-    var savedContent: String? = "1"
 
     private val viewModel: PostViewModel by viewModels(
         ownerProducer = ::requireParentFragment
@@ -37,49 +30,25 @@ class NewPostFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val binding = FragmentNewPostBinding.inflate(
             inflater,
             container,
             false
         )
 
-        val sharedPrefs = requireActivity().getSharedPreferences("PREFS", Context.MODE_PRIVATE)
-        val callback = requireActivity().onBackPressedDispatcher.addCallback(this) {
-            savedContent = binding.content.text.toString()
-            sharedPrefs?.edit()?.putString("SAVED_CONTENT", savedContent)?.apply()
-            findNavController().navigateUp()
-        }
-
-        if (args.content.isNullOrEmpty()){
-            sharedPrefs?.getString("SAVED_CONTENT", "")?.let {
-                savedContent = it
-                binding.content.setText(savedContent.toString())
-            }
-        } else binding.content.setText(args.content)
-
-
-        if (!args.videoLink.isNullOrEmpty()) {
-            binding.videoLink.visibility = View.VISIBLE
-            binding.videoLink.setText(args.videoLink.toString())
-        }
-        binding.attachBtn.setOnClickListener {
-            binding.videoLink.visibility = View.VISIBLE
-        }
-
-        binding.content.requestFocus()
+        arguments?.textArg
+            ?.let(binding.content::setText)
 
         binding.save.setOnClickListener {
-            sharedPrefs.edit().clear().apply()
-            viewModel.changeContent(
-                binding.content.text.toString(),
-                binding.videoLink.text.toString()
-            )
+            viewModel.changeContent(binding.content.text.toString())
             viewModel.save()
             AndroidUtils.hideKeyboard(requireView())
+        }
+        viewModel.postCreated.observe(viewLifecycleOwner) {
+            viewModel.loadPosts()
             findNavController().navigateUp()
         }
         return binding.root
     }
-
 }

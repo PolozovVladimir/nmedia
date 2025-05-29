@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import ru.netology.nmedia.dto.Post
 
 
+/*
 class InMemoryPostRepository : PostRepository {
     private var nextId = 1L
 
@@ -149,4 +150,4 @@ class InMemoryPostRepository : PostRepository {
         }
         data.value = posts
     }
-}
+}*/

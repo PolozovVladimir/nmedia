@@ -15,31 +15,23 @@ interface PostDao {
     @Insert
     fun insert(post: PostEntity)
 
-    @Query("UPDATE PostEntity SET content = :content WHERE id = :id ")
+    @Insert
+    fun insert(posts: List<PostEntity>)
+
+    @Query("UPDATE PostEntity SET content = :content WHERE id = :id")
     fun updateContentById(id: Long, content: String)
 
     fun save(post: PostEntity) =
         if (post.id == 0L) insert(post) else updateContentById(post.id, post.content)
 
-    @Query(
-        """
+    @Query("""
         UPDATE PostEntity SET
-               countOfLikes = countOfLikes + CASE WHEN likedByMe THEN -1 ELSE 1 END,
-               likedByMe = CASE WHEN likedByMe THEN 0 ELSE 1 END
-           WHERE id = :id
-        """
-    )
-    fun likedById(id: Long)
+        likes = likes + CASE WHEN likedByMe THEN -1 ELSE 1 END,
+        likedByMe = CASE WHEN likedByMe THEN 0 ELSE 1 END
+        WHERE id = :id
+        """)
+    fun likeById(id: Long)
 
     @Query("DELETE FROM PostEntity WHERE id = :id")
     fun removeById(id: Long)
-
-    @Query(
-        """
-            UPDATE PostEntity SET
-            countOfShares = countOfShares+1
-            WHERE id= :id
-        """
-    )
-    fun shareById(id: Long)
 }
