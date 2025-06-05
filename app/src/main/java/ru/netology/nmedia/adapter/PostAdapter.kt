@@ -1,12 +1,14 @@
 package ru.netology.nmedia.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Post
@@ -17,6 +19,8 @@ interface OnInteractionListener {
     fun onRemove(post: Post) {}
     fun onShare(post: Post) {}
 }
+
+val BASE_URL = "http://10.0.2.2:9999"
 
 class PostAdapter(
     private val onInteractionListener: OnInteractionListener,
@@ -37,7 +41,14 @@ class PostViewHolder(
     private val onInteractionListener: OnInteractionListener,
 ) : RecyclerView.ViewHolder(binding.root) {
 
+
     fun bind(post: Post) {
+        getAvatars(post,binding)
+        if (post.attachment!=null){
+            binding.attachImage.visibility = View.VISIBLE
+            getAttachment(post,binding)
+        } else binding.attachImage.visibility = View.GONE
+
         binding.apply {
             author.text = post.author
             published.text = post.published
@@ -75,6 +86,24 @@ class PostViewHolder(
             }
         }
     }
+}
+
+fun getAvatars(post: Post, binding: CardPostBinding){
+    Glide.with(binding.avatar)
+        .load("$BASE_URL/avatars/${post.authorAvatar}")
+        .placeholder(R.drawable.ic_baseline_man_24)
+        .error(R.drawable.ic_baseline_cancel_24)
+        .circleCrop()
+        .timeout(10_000)
+        .into(binding.avatar)
+}
+
+fun getAttachment(post: Post, binding: CardPostBinding){
+    Glide.with(binding.attachImage)
+        .load("$BASE_URL/images/${post.attachment?.url}")
+        .error(R.drawable.ic_baseline_cancel_24)
+        .timeout(10_000)
+        .into(binding.attachImage)
 }
 
 class PostDiffCallback : DiffUtil.ItemCallback<Post>() {
