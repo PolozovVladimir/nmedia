@@ -11,4 +11,8 @@
     <string name="input_video_link_here">Место для вставки ссылки на видео</string>
     <string name="notification_user_liked">Пользователю %1$s понравился пост %2$s</string>
     <string name="notification_new_post">%1$s опубликовал новый пост</string>
+    <string name="error_loading">Ошибка загрузки</string>Add commentMore actions
+    <string name="retry_loading">Повторить загрузку</string>
+    <string name="empty_posts">Постов нет</string>
+    <string name="google_play_unavailable">Службы гугл не доступны</string>
 </resources>

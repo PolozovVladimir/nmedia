@@ -25,12 +25,12 @@
     <string name="channel_remote_description" translatable="false">Notifications from remote server</string>
     <string name="notification_user_liked" >%1$s liked %2$s\'s post</string>
     <string name="notification_new_post">%1$s published new post</string>
-    <string name="empty">Empty</string>
-    <string name="retry">Retry</string>
-    <string name="something_went_wrong">Something went wrong</string>
-    <string name="error_loading">error_loading</string>
-    <string name="retry_loading">retry_loading</string>
-    <string name="empty_posts">empty_posts</string>
-    <string name="google_play_unavailable">google_play_unavailable</string>
+    <string name="empty" translatable="false">Empty</string>
+    <string name="retry" translatable="false">Retry</string>
+    <string name="something_went_wrong" translatable="false">Something went wrong</string>
+    <string name="error_loading" translatable="false">error_loading</string>
+    <string name="retry_loading" translatable="false">retry_loading</string>
+    <string name="empty_posts" translatable="false">empty_posts</string>
+    <string name="google_play_unavailable" translatable="false">google_play_unavailable</string>
 
 </resources>

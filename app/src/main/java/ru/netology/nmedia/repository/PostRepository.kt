@@ -2,32 +2,24 @@ package ru.netology.nmedia.repository
 
 
 
+import android.content.Context
 import ru.netology.nmedia.dto.Post
 
 
 interface PostRepository {
-    fun getAll(): List<Post>
-    fun likeByIdAsync(id:Long, callback: PostsCallback<Post>)
-    fun dislikeByIdAsync(id:Long, callback: PostsCallback<Post>)
-    fun removeByIdAsync(id: Long, callback: SaveAndRemovePostsCallback)
-    fun saveAsync(post: Post,callback: PostsCallback<Post>)
+    fun getAllAsync(callback: Callback<List<Post>>, context: Context)
+    fun save(post: Post, callback: Callback<Post>)
+    fun removeById(id: Long, callback: RemCallback)
+    fun likeById(id: Long, callback: Callback<Post>)
+    fun dislikeById(id: Long,callback: Callback<Post>)
 
-    fun getAllAsync(callback: PostsCallback<List<Post>>)
-
-
-    interface PostsCallback<T> {
-        fun onSuccess(posts: T)
-        fun onError(e: Exception)
+    interface Callback<T> {
+        fun onSuccess(posts: T) {}
+        fun onError(e: Exception) {}
     }
 
-    interface SaveAndRemovePostsCallback{
+    interface RemCallback{
         fun onSuccess()
-        fun onError(e: Exception)
+        fun onError(e:Exception){}
     }
-
-    interface SaveCallback{
-        fun onSuccess()
-        fun onError(e: Exception)
-    }
-
 }
