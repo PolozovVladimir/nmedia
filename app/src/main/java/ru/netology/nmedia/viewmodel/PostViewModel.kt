@@ -4,8 +4,13 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModel
+import ru.netology.nmedia.model.FeedModelState
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImpl
 import ru.netology.nmedia.util.SingleLiveEvent

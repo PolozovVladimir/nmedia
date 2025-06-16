@@ -6,14 +6,13 @@ import androidx.credentials.exceptions.domerrors.NetworkError
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import okio.IOException
-import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.Response
-import ru.netology.nmedia.api.PostApiServiceHolder
+import ru.netology.nmedia.api.PostApi
 import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.toDto
+import ru.netology.nmedia.entity.toEntity
 
 class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
     override val data: LiveData<List<Post>>
