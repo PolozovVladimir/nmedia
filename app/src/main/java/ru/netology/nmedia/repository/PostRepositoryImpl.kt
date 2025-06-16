@@ -8,6 +8,7 @@ import androidx.lifecycle.map
 import okio.IOException
 import retrofit2.Response
 import ru.netology.nmedia.api.PostApi
+import ru.netology.nmedia.appError.ApiError
 import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.entity.PostEntity
