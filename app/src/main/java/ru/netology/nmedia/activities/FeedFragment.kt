@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -64,6 +65,10 @@ class FeedFragment : Fragment() {
             binding.swiprefresh.isRefreshing = state.loading
         }
 
+        viewModel.requestCode.observe(viewLifecycleOwner) { requestCode ->
+            toastOnError(requestCode)
+        }
+
         binding.retryButton.setOnClickListener {
             viewModel.loadPosts()
         }
@@ -78,5 +83,20 @@ class FeedFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    private fun toastOnError(requestCode: Int) {
+        if (requestCode.toString().startsWith("1")) {
+            Toast.makeText(context, "Информационный код ответа", Toast.LENGTH_SHORT).show()
+        }
+        if (requestCode.toString().startsWith("3")) {
+            Toast.makeText(context, "Перенаправление", Toast.LENGTH_SHORT).show()
+        }
+        if (requestCode.toString().startsWith("4")) {
+            Toast.makeText(context, "Ошибка клиента", Toast.LENGTH_SHORT).show()
+        }
+        if (requestCode.toString().startsWith("5")) {
+            Toast.makeText(context, "Ошибка сервера", Toast.LENGTH_SHORT).show()
+        }
     }
 }
