@@ -44,10 +44,16 @@ class PostViewHolder(
 
     fun bind(post: Post) {
         getAvatars(post,binding)
-        if (post.attachment!=null){
-            binding.attachImage.visibility = View.VISIBLE
-            getAttachment(post,binding)
-        } else binding.attachImage.visibility = View.GONE
+        if (!post.savedOnServer){
+            binding.like.visibility = View.INVISIBLE
+            binding.share.visibility = View.INVISIBLE
+        } else {
+            binding.like.visibility = View.VISIBLE
+            binding.share.visibility = View.VISIBLE
+        }
+        if (post.savedOnServer){
+            binding.savedOnServer.setImageResource(R.drawable.ic_baseline_public_24)
+        } else binding.savedOnServer.setImageResource(R.drawable.ic_baseline_public_off_24)
 
         binding.apply {
             author.text = post.author
@@ -96,14 +102,6 @@ fun getAvatars(post: Post, binding: CardPostBinding){
         .circleCrop()
         .timeout(10_000)
         .into(binding.avatar)
-}
-
-fun getAttachment(post: Post, binding: CardPostBinding){
-    Glide.with(binding.attachImage)
-        .load("$BASE_URL/images/${post.attachment?.url}")
-        .error(R.drawable.ic_baseline_cancel_24)
-        .timeout(10_000)
-        .into(binding.attachImage)
 }
 
 class PostDiffCallback : DiffUtil.ItemCallback<Post>() {

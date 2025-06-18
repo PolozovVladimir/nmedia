@@ -11,6 +11,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostAdapter
@@ -58,16 +59,25 @@ class FeedFragment : Fragment() {
 
         binding.list.adapter = adapter
         viewModel.data.observe(viewLifecycleOwner) { state ->
-            adapter.submitList(state.posts)
-            binding.progress.isVisible = state.loading
-            binding.errorGroup.isVisible = state.error
+            val newPost = state.posts.size>adapter.currentList.size
+            adapter.submitList(state.posts){
+                if (newPost) binding.list.smoothScrollToPosition(0)
+            }
             binding.emptyText.isVisible = state.empty
-            binding.swiprefresh.isRefreshing = state.loading
+
+        }
+        viewModel.dataState.observe(viewLifecycleOwner){ state ->
+            binding.progress.isVisible = state.loading
+            if (state.error){
+                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG).setAction(R.string.retry_loading){
+                    viewModel.refresh()
+                }
+                    .show()
+            }
+            //binding.errorGroup.isVisible = state.error
+            binding.swiprefresh.isRefreshing = state.refreshing
         }
 
-        viewModel.requestCode.observe(viewLifecycleOwner) { requestCode ->
-            toastOnError(requestCode)
-        }
 
         binding.retryButton.setOnClickListener {
             viewModel.loadPosts()
@@ -85,18 +95,4 @@ class FeedFragment : Fragment() {
         return binding.root
     }
 
-    private fun toastOnError(requestCode: Int) {
-        if (requestCode.toString().startsWith("1")) {
-            Toast.makeText(context, "Информационный код ответа", Toast.LENGTH_SHORT).show()
-        }
-        if (requestCode.toString().startsWith("3")) {
-            Toast.makeText(context, "Перенаправление", Toast.LENGTH_SHORT).show()
-        }
-        if (requestCode.toString().startsWith("4")) {
-            Toast.makeText(context, "Ошибка клиента", Toast.LENGTH_SHORT).show()
-        }
-        if (requestCode.toString().startsWith("5")) {
-            Toast.makeText(context, "Ошибка сервера", Toast.LENGTH_SHORT).show()
-        }
-    }
 }

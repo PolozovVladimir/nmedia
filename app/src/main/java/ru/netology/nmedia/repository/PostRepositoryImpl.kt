@@ -2,13 +2,14 @@ package ru.netology.nmedia.repository
 
 import android.content.Context
 import android.widget.Toast
-import androidx.credentials.exceptions.domerrors.NetworkError
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import okio.IOException
 import retrofit2.Response
 import ru.netology.nmedia.api.PostApi
 import ru.netology.nmedia.appError.ApiError
+import ru.netology.nmedia.appError.NetworkError
+import ru.netology.nmedia.appError.UnknownError
 import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.entity.PostEntity
@@ -37,9 +38,8 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
         }
     }
 
-
     override suspend fun save(post: Post) {
-        dao.insert(PostEntity.fromDto(post))
+        val tempId =  dao.insert(PostEntity.fromDto(post))
         try {
             val response = PostApi.service.save(post)
             if (!response.isSuccessful) {
@@ -47,15 +47,14 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
             body.savedOnServer = true
+            dao.removeById(tempId)
             dao.insert(PostEntity.fromDto(body))
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
             throw UnknownError
         }
-
     }
-
 
     override suspend fun likeById(id: Long) {
         dao.likeById(id)
@@ -66,13 +65,11 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
             dao.insert(PostEntity.fromDto(body))
-
-        }catch (e: IOException) {
+        } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
             throw UnknownError
         }
-
     }
 
     override suspend fun dislikeById(id: Long) {
@@ -84,15 +81,12 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
             dao.insert(PostEntity.fromDto(body))
-
-        }catch (e: IOException) {
+        } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
             throw UnknownError
         }
-
     }
-
 
     override suspend fun removeById(id: Long) {
         dao.removeById(id)
@@ -101,13 +95,10 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
-
-
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
             throw UnknownError
         }
-
     }
 }
