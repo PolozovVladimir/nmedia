@@ -1,18 +1,13 @@
 package ru.netology.nmedia.repository
 
-
-
-import android.content.Context
 import androidx.lifecycle.LiveData
 import ru.netology.nmedia.dto.Post
 
-
 interface PostRepository {
-    val data : LiveData<List<Post>>
+    val data: LiveData<List<Post>>
     suspend fun getAll()
+    suspend fun likeById(id: Long)
     suspend fun save(post: Post)
     suspend fun removeById(id: Long)
-    suspend fun likeById(id: Long)
-    suspend fun dislikeById(id: Long)
-
+    fun generateTempId(): Long // Добавлен метод генерации временного ID
 }

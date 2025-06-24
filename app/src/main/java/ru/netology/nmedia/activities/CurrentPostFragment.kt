@@ -1,22 +1,7 @@
 package ru.netology.nmedia.activities
 
-import android.annotation.SuppressLint
-import android.content.Intent
-import android.net.Uri
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
-import ru.netology.nmedia.R
-import ru.netology.nmedia.adapter.OnInteractionListener
-import ru.netology.nmedia.adapter.PostViewHolder
-import ru.netology.nmedia.databinding.FragmentCurrentPostBinding
-import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.viewmodel.PostViewModel
+
 class CurrentPostFragment: Fragment(){
 
    /* val viewModel: PostViewModel by viewModels(

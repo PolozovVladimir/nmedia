@@ -1,30 +1,24 @@
-package ru.netology.nmedia.db
+package ru.netology.nmedia.dto
 
-import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import ru.netology.nmedia.dao.PostDao
-import ru.netology.nmedia.entity.PostEntity
 
-@Database(entities = [PostEntity::class], version = 1)
-abstract class AppDb : RoomDatabase(){
-    abstract fun postDao():PostDao
+data class Post(
+    val id: Long,
+    val author: String,
+    val authorAvatar: String = "",
+    val content: String,
+    val published: String,
+    val likedByMe: Boolean,
+    val likes: Int = 0,
+    //var attachment: Attachment? = null,
+    var savedOnServer: Boolean = false
+)
 
-    companion object {
-        @Volatile
-        private var instance: AppDb? = null
+data class Attachment(
+    val url: String,
+    val description: String?,
+    val type: AttachmentType,
+)
 
-        fun getInstance(context: Context): AppDb {
-            return instance ?: synchronized(this){
-                instance ?: buildDatabase(context).also {
-                    instance = it }
-            }
-        }
-        private fun buildDatabase(context: Context) =
-            Room.databaseBuilder(context, AppDb::class.java, "app.db")
-                .fallbackToDestructiveMigration()
-                // .allowMainThreadQueries()
-                .build()
-    }
+enum class AttachmentType {
+    IMAGE
 }
