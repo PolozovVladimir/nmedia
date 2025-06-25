@@ -14,12 +14,15 @@ data class Post(
     val shares: Int = 0,
     val views: Int = 0,
     val video: String? = null,
+
     @Transient val savedOnServer: Boolean = false
 ) {
+
     fun copyWithLikes(byMe: Boolean, count: Int) = copy(
         likedByMe = byMe,
         likes = count
     )
+
 
     fun toDto() = Post(
         id = id,
@@ -34,6 +37,7 @@ data class Post(
     )
 
     companion object {
+
         fun empty() = Post(
             id = 0,
             author = "",

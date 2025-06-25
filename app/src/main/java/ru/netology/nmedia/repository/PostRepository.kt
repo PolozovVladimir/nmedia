@@ -9,5 +9,5 @@ interface PostRepository {
     suspend fun likeById(id: Long)
     suspend fun save(post: Post)
     suspend fun removeById(id: Long)
-    fun generateTempId(): Long // Добавлен метод генерации временного ID
+    fun generateTempId(): Long
 }

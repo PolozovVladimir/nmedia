@@ -10,15 +10,11 @@ class PostRepositoryImpl : PostRepository {
     private var tempIdCounter = -1L
     private val service = ApiService.service
     private val _data = MutableLiveData<List<Post>>()
-
-    override val data: LiveData<List<Post>>
-        get() = _data
+    override val data: LiveData<List<Post>> = _data
 
     init {
         _data.value = emptyList()
     }
-
-    override fun generateTempId(): Long = tempIdCounter--
 
     override suspend fun getAll() {
         try {
@@ -37,7 +33,6 @@ class PostRepositoryImpl : PostRepository {
         val oldPost = _data.value?.find { it.id == id } ?: return
         val newLikes = (oldPost.likes + if (oldPost.likedByMe) -1 else 1).coerceAtLeast(0)
         val newPost = oldPost.copyWithLikes(!oldPost.likedByMe, newLikes)
-
         updateLocal(newPost)
 
         try {
@@ -93,6 +88,8 @@ class PostRepositoryImpl : PostRepository {
             throw e
         }
     }
+
+    override fun generateTempId(): Long = tempIdCounter--
 
     private fun updateLocal(newPost: Post) {
         _data.value = _data.value?.map { if (it.id == newPost.id) newPost else it }

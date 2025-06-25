@@ -35,21 +35,19 @@ class NewPostFragment : Fragment() {
         )
 
         arguments?.textArg
-            ?.let(binding.edit::setText)
+            ?.let { binding.content.setText(it) }
 
-        binding.edit.requestFocus()
-        AndroidUtils.showKeyboard(binding.edit)
+        binding.content.requestFocus()
+        AndroidUtils.showKeyboard(binding.content)
 
-        binding.ok.setOnClickListener {
-            val text = binding.edit.text.toString()
+        binding.save.setOnClickListener {
+            val text = binding.content.text.toString()
             if (text.isBlank()) {
                 Toast.makeText(requireContext(), "Content can't be empty", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            viewModel.save(
-                Post.empty().copy(content = text)
-            )
+            viewModel.save(Post.empty().copy(content = text))
             AndroidUtils.hideKeyboard(requireView())
             findNavController().navigateUp()
         }
