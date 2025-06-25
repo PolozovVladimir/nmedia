@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import ru.netology.nmedia.databinding.FragmentNewPostBinding
-import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.dto.PostDto
 import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.viewmodel.PostViewModel
@@ -34,9 +34,7 @@ class NewPostFragment : Fragment() {
             false
         )
 
-        arguments?.textArg
-            ?.let { binding.content.setText(it) }
-
+        arguments?.textArg?.let { binding.content.setText(it) }
         binding.content.requestFocus()
         AndroidUtils.showKeyboard(binding.content)
 
@@ -47,7 +45,9 @@ class NewPostFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            viewModel.save(Post.empty().copy(content = text))
+            viewModel.edit(Post.empty().copy(content = text))
+            viewModel.save()
+
             AndroidUtils.hideKeyboard(requireView())
             findNavController().navigateUp()
         }

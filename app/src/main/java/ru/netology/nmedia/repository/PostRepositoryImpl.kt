@@ -3,113 +3,76 @@ package ru.netology.nmedia.repository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import ru.netology.nmedia.api.ApiService
-import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.appError.NetworkError
+import ru.netology.nmedia.dao.PostDao
+import ru.netology.nmedia.dto.PostDto
+import ru.netology.nmedia.entity.PostEntity
 import java.io.IOException
+import javax.inject.Inject
 
-class PostRepositoryImpl : PostRepository {
-    private var tempIdCounter = -1L
-    private val service = ApiService.service
-    private val _data = MutableLiveData<List<Post>>()
-    override val data: LiveData<List<Post>> = _data
-
-    init {
-        _data.value = emptyList()
-    }
-
-    override suspend fun getAll() {
+class PostRepositoryImpl @Inject constructor(
+    private val dao: PostDao
+) : PostRepository {
+    override suspend fun getAll(): List<PostDto> {
         try {
-            val response = service.getAll()
+            val response = PostsApi.service.getAll()
             if (!response.isSuccessful) {
-                throw RuntimeException("HTTP error: ${response.code()}")
+                throw ApiError(response.code(), response.message())
             }
-            val body = response.body() ?: throw RuntimeException("Body is null")
-            _data.postValue(body.map { it.copy(savedOnServer = true) })
+            val posts = response.body() ?: throw ApiError(response.code(), response.message())
+            dao.insert(posts.map(PostEntity::fromDto))
+            return dao.getAll().map(PostEntity::toDto)
         } catch (e: IOException) {
-            throw RuntimeException("Network error", e)
+            val posts = dao.getAll().map(PostEntity::toDto)
+            if (posts.isNotEmpty()) {
+                return posts
+            }
+            throw NetworkError
+        } catch (e: Exception) {
+            throw NetworkError
         }
     }
 
-    override suspend fun likeById(id: Long) {
-        val oldPost = _data.value?.find { it.id == id } ?: return
-        val newLikes = (oldPost.likes + if (oldPost.likedByMe) -1 else 1).coerceAtLeast(0)
-        val newPost = oldPost.copyWithLikes(!oldPost.likedByMe, newLikes)
-        updateLocal(newPost)
-
+    override suspend fun save(post: PostDto) {
         try {
-            val response = service.likeById(id)
+            val response = PostsApi.service.save(post)
             if (!response.isSuccessful) {
-                throw RuntimeException("HTTP error: ${response.code()}")
+                throw ApiError(response.code(), response.message())
             }
-            val body = response.body() ?: throw RuntimeException("Body is null")
-            updateLocal(body.copy(savedOnServer = true))
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            dao.insert(PostEntity.fromDto(body))
+        } catch (e: IOException) {
+            throw NetworkError
         } catch (e: Exception) {
-            updateLocal(oldPost)
-            throw e
-        }
-    }
-
-    override suspend fun save(post: Post) {
-        val postToSave = if (post.id == 0L) {
-            post.copy(id = generateTempId(), savedOnServer = false)
-        } else {
-            post
-        }
-
-        if (postToSave.id < 0) {
-            addLocal(postToSave)
-        } else {
-            updateLocal(postToSave)
-        }
-
-        try {
-            val response = service.save(postToSave.toDto())
-            if (!response.isSuccessful) {
-                throw RuntimeException("HTTP error: ${response.code()}")
-            }
-            val body = response.body() ?: throw RuntimeException("Body is null")
-            replaceLocalPost(postToSave.id, body.copy(savedOnServer = true))
-        } catch (e: Exception) {
-            markPostAsNotSaved(postToSave)
-            throw e
+            throw NetworkError
         }
     }
 
     override suspend fun removeById(id: Long) {
-        val oldPost = _data.value?.find { it.id == id } ?: return
-        removeLocal(id)
-
         try {
-            val response = service.removeById(id)
-            if (!response.isSuccessful) {
-                throw RuntimeException("HTTP error: ${response.code()}")
-            }
+            dao.removeById(id)
+            PostsApi.service.removeById(id)
         } catch (e: Exception) {
-            addLocal(oldPost)
-            throw e
+            throw NetworkError
         }
     }
 
-    override fun generateTempId(): Long = tempIdCounter--
+    override suspend fun likeById(id: Long) {
+        try {
+            val post = dao.getById(id).toDto()
+            val newPost = post.copy(
+                likes = if (post.likedByMe) post.likes - 1 else post.likes + 1,
+                likedByMe = !post.likedByMe
+            )
+            dao.insert(PostEntity.fromDto(newPost))
 
-    private fun updateLocal(newPost: Post) {
-        _data.value = _data.value?.map { if (it.id == newPost.id) newPost else it }
-    }
-
-    private fun addLocal(post: Post) {
-        _data.value = listOf(post) + (_data.value ?: emptyList())
-    }
-
-    private fun removeLocal(id: Long) {
-        _data.value = _data.value?.filter { it.id != id }
-    }
-
-    private fun replaceLocalPost(oldId: Long, newPost: Post) {
-        _data.value = _data.value?.map { if (it.id == oldId) newPost else it }
-    }
-
-    private fun markPostAsNotSaved(post: Post) {
-        _data.value = _data.value?.map {
-            if (it.id == post.id) post.copy(savedOnServer = false) else it
+            if (newPost.likedByMe) {
+                PostsApi.service.likeById(id)
+            } else {
+                PostsApi.service.dislikeById(id)
+            }
+        } catch (e: Exception) {
+            throw NetworkError
         }
     }
 }

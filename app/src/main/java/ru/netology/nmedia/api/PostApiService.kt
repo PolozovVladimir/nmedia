@@ -7,18 +7,18 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 import ru.netology.nmedia.BuildConfig
-import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.dto.PostDto
 import java.util.concurrent.TimeUnit
 
 interface ApiServiceInterface {
     @GET("posts")
-    suspend fun getAll(): Response<List<Post>>
+    suspend fun getAll(): Response<List<PostDto>>
 
     @POST("posts")
-    suspend fun save(@Body post: Post): Response<Post>
+    suspend fun save(@Body post: PostDto): Response<PostDto>
 
     @POST("posts/{id}/likes")
-    suspend fun likeById(@Path("id") id: Long): Response<Post>
+    suspend fun likeById(@Path("id") id: Long): Response<PostDto>
 
     @DELETE("posts/{id}")
     suspend fun removeById(@Path("id") id: Long): Response<Unit>
