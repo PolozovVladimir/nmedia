@@ -4,7 +4,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import ru.netology.nmedia.dto.Post
 
-
 @Entity
 data class PostEntity(
     @PrimaryKey(autoGenerate = true)

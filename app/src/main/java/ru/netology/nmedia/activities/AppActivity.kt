@@ -9,7 +9,8 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
 import ru.netology.nmedia.R
-import ru.netology.nmedia.view.NewPostFragment.Companion.textArg
+import ru.netology.nmedia.fragment.NewPostFragment.Companion.textArg
+
 
 class AppActivity : AppCompatActivity(R.layout.activity_app) {
     override fun onCreate(savedInstanceState: Bundle?) {
