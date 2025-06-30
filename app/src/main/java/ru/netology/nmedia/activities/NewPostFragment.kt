@@ -1,4 +1,4 @@
-package ru.netology.nmedia.view
+package ru.netology.nmedia.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import ru.netology.nmedia.databinding.FragmentNewPostBinding
-import ru.netology.nmedia.dto.PostDto
+import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.viewmodel.PostViewModel
@@ -41,7 +41,7 @@ class NewPostFragment : Fragment() {
         binding.save.setOnClickListener {
             val text = binding.content.text.toString()
             if (text.isBlank()) {
-                Toast.makeText(requireContext(), "Content can't be empty", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Содержимое не может быть пустым", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 

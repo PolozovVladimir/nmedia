@@ -1,4 +1,4 @@
-package ru.netology.nmedia.activities
+package ru.netology.nmedia.fragment
 
 import android.content.Intent
 import android.os.Bundle
@@ -12,9 +12,9 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.OnInteractionListener
-import ru.netology.nmedia.adapter.PostAdapter
+import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
-import ru.netology.nmedia.dto.PostDto
+import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 class FeedFragment : Fragment() {
@@ -33,45 +33,30 @@ class FeedFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupUI()
-        setupObservers()
-    }
 
-    private fun setupUI() {
-        val adapter = PostAdapter(object : OnInteractionListener {
-            override fun onEdit(post: PostDto) {
+        val adapter = PostsAdapter(object : OnInteractionListener {
+            override fun onEdit(post: Post) {
                 viewModel.edit(post)
                 findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
             }
 
-            override fun onLike(post: PostDto) {
+            override fun onLike(post: Post) {
                 viewModel.likeById(post.id)
             }
 
-            override fun onRemove(post: PostDto) {
+            override fun onRemove(post: Post) {
                 viewModel.removeById(post.id)
             }
 
-            override fun onShare(post: PostDto) {
+            override fun onShare(post: Post) {
                 sharePost(post)
             }
         })
 
         binding.list.adapter = adapter
 
-        binding.createBtn.setOnClickListener {
-            viewModel.edit(PostDto.empty())
-            findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
-        }
-
-        binding.swiprefresh.setOnRefreshListener {
-            viewModel.refresh()
-        }
-    }
-
-    private fun setupObservers() {
         viewModel.data.observe(viewLifecycleOwner) { posts ->
-            (binding.list.adapter as? PostAdapter)?.submitList(posts)
+            adapter.submitList(posts)
             binding.emptyText.isVisible = posts.isEmpty()
         }
 
@@ -88,9 +73,18 @@ class FeedFragment : Fragment() {
         viewModel.refreshing.observe(viewLifecycleOwner) { refreshing ->
             binding.swiprefresh.isRefreshing = refreshing
         }
+
+        binding.createBtn.setOnClickListener {
+            viewModel.edit(Post.empty())
+            findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
+        }
+
+        binding.swiprefresh.setOnRefreshListener {
+            viewModel.refresh()
+        }
     }
 
-    private fun sharePost(post: PostDto) {
+    private fun sharePost(post: Post) {
         val intent = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, post.content)

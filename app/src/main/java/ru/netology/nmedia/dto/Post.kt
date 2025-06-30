@@ -1,6 +1,6 @@
 package ru.netology.nmedia.dto
 
-data class PostDto(
+data class Post(
     val id: Long,
     val author: String,
     val authorAvatar: String,
@@ -13,7 +13,7 @@ data class PostDto(
     val videoUrl: String? = null
 ) {
     companion object {
-        fun empty() = PostDto(
+        fun empty() = Post(
             id = 0,
             author = "",
             authorAvatar = "",

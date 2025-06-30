@@ -4,9 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import ru.netology.nmedia.dto.PostDto
+import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.repository.PostRepository
+import javax.inject.Inject
 
 @HiltViewModel
 class PostViewModel @Inject constructor(
@@ -52,7 +54,7 @@ class PostViewModel @Inject constructor(
             try {
                 repository.likeById(id)
             } catch (e: Exception) {
-                _error.value = "Like error: ${e.message}"
+                _error.value = "Ошибка лайка: ${e.message}"
             }
         }
     }
@@ -63,7 +65,7 @@ class PostViewModel @Inject constructor(
             try {
                 repository.removeById(id)
             } catch (e: Exception) {
-                _error.value = "Delete error: ${e.message}"
+                _error.value = "Ошибка удаления: ${e.message}"
             }
         }
     }
@@ -75,7 +77,7 @@ class PostViewModel @Inject constructor(
                     repository.save(post)
                     _editedPost.value = null
                 } catch (e: Exception) {
-                    _error.value = "Save error: ${e.message}"
+                    _error.value = "Ошибка сохранения: ${e.message}"
                 }
             }
         }

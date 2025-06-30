@@ -10,20 +10,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
-import ru.netology.nmedia.dto.PostDto
+import ru.netology.nmedia.dto.Post
 
 interface OnInteractionListener {
-    fun onLike(post: PostDto) {}
-    fun onEdit(post: PostDto) {}
-    fun onRemove(post: PostDto) {}
-    fun onShare(post: PostDto) {}
+    fun onLike(post: Post) {}
+    fun onEdit(post: Post) {}
+    fun onRemove(post: Post) {}
+    fun onShare(post: Post) {}
 }
 
 val BASE_URL = "http://10.0.2.2:9999"
 
 class PostAdapter(
     private val onInteractionListener: OnInteractionListener,
-) : ListAdapter<PostDto, PostViewHolder>(PostDiffCallback()) {
+) : ListAdapter<Post, PostViewHolder>(PostDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = CardPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return PostViewHolder(binding, onInteractionListener)
@@ -41,7 +41,7 @@ class PostViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
 
 
-    fun bind(post: PostDto) {
+    fun bind(post: Post) {
         getAvatars(post,binding)
         if (!post.savedOnServer){
             binding.like.visibility = View.INVISIBLE
@@ -93,7 +93,7 @@ class PostViewHolder(
     }
 }
 
-fun getAvatars(post: PostDto, binding: CardPostBinding){
+fun getAvatars(post: Post, binding: CardPostBinding){
     Glide.with(binding.avatar)
         .load("$BASE_URL/avatars/${post.authorAvatar}")
         .placeholder(R.drawable.ic_baseline_man_24)
@@ -103,12 +103,12 @@ fun getAvatars(post: PostDto, binding: CardPostBinding){
         .into(binding.avatar)
 }
 
-class PostDiffCallback : DiffUtil.ItemCallback<PostDto>() {
-    override fun areItemsTheSame(oldItem: PostDto, newItem: PostDto): Boolean {
+class PostDiffCallback : DiffUtil.ItemCallback<Post>() {
+    override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
         return oldItem.id == newItem.id
     }
 
-    override fun areContentsTheSame(oldItem: PostDto, newItem: PostDto): Boolean {
+    override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean {
         return oldItem == newItem
     }
 }
