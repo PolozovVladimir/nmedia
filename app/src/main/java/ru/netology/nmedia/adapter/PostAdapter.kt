@@ -14,7 +14,7 @@ import ru.netology.nmedia.dto.Post
 
 interface OnInteractionListener {
     fun onLike(post: Post) {}
-    fun onEdit(post: Post) {}
+    // УДАЛЕНО: fun onEdit(post: Post) {}
     fun onRemove(post: Post) {}
     fun onShare(post: Post) {}
 }
@@ -40,46 +40,40 @@ class PostViewHolder(
     private val onInteractionListener: OnInteractionListener,
 ) : RecyclerView.ViewHolder(binding.root) {
 
-
     fun bind(post: Post) {
-        getAvatars(post,binding)
-//        if (post.attachment!=null){
-//            binding.attachImage.visibility = View.VISIBLE
-//            getAttachment(post,binding)
-//        } else binding.attachImage.visibility = View.GONE
-        if (!post.savedOnServer){
+        getAvatars(post, binding)
+
+        if (!post.savedOnServer) {
             binding.like.visibility = View.INVISIBLE
             binding.share.visibility = View.INVISIBLE
         } else {
             binding.like.visibility = View.VISIBLE
             binding.share.visibility = View.VISIBLE
         }
-        if (post.savedOnServer){
+
+        if (post.savedOnServer) {
             binding.savedOnServer.setImageResource(R.drawable.ic_baseline_public_24)
-        } else binding.savedOnServer.setImageResource(R.drawable.ic_baseline_public_off_24)
+        } else {
+            binding.savedOnServer.setImageResource(R.drawable.ic_baseline_public_off_24)
+        }
 
         binding.apply {
             author.text = post.author
             published.text = post.published
             content.text = post.content
-            // в адаптере
             like.isChecked = post.likedByMe
             like.text = "${post.likes}"
 
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
                     inflate(R.menu.post_menu)
+                    // УДАЛЕН пункт Edit из меню
                     setOnMenuItemClickListener { item ->
                         when (item.itemId) {
                             R.id.remove -> {
                                 onInteractionListener.onRemove(post)
                                 true
                             }
-                            R.id.edit -> {
-                                onInteractionListener.onEdit(post)
-                                true
-                            }
-
                             else -> false
                         }
                     }
@@ -97,7 +91,7 @@ class PostViewHolder(
     }
 }
 
-fun getAvatars(post: Post, binding: CardPostBinding){
+fun getAvatars(post: Post, binding: CardPostBinding) {
     Glide.with(binding.avatar)
         .load("$BASE_URL/avatars/${post.authorAvatar}")
         .placeholder(R.drawable.ic_baseline_man_24)
@@ -106,14 +100,6 @@ fun getAvatars(post: Post, binding: CardPostBinding){
         .timeout(10_000)
         .into(binding.avatar)
 }
-
-//fun getAttachment(post: Post, binding: CardPostBinding){
-//    Glide.with(binding.attachImage)
-//        .load("$BASE_URL/images/${post.attachment?.url}")
-//        .error(R.drawable.ic_baseline_cancel_24)
-//        .timeout(10_000)
-//        .into(binding.attachImage)
-//}
 
 class PostDiffCallback : DiffUtil.ItemCallback<Post>() {
     override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
