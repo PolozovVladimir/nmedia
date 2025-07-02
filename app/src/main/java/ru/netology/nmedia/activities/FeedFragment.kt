@@ -1,4 +1,4 @@
-package ru.netology.nmedia.fragment
+package ru.netology.nmedia.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -27,7 +27,6 @@ class FeedFragment : Fragment() {
     ): View {
         val binding = FragmentFeedBinding.inflate(inflater, container, false)
         val adapter = PostAdapter(object : OnInteractionListener {
-
             override fun onLike(post: Post) {
                 if (post.likedByMe) {
                     viewModel.dislikeById(post.id)
