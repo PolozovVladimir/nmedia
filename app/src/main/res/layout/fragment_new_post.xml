@@ -1,62 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:padding="@dimen/common_spacing"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.NewPostFragment">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-
-    <TableRow>
-        <EditText
-            android:id="@+id/content"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="top"
-            android:inputType="textMultiLine"
-            android:hint="@string/post_input_text"
-            android:importantForAutofill="no"
-            android:layout_weight="5"
-            />
-        <ImageView
-            android:id="@+id/attachBtn"
-            android:layout_marginTop="@dimen/small_spacing"
-            android:src="@drawable/ic_baseline_attach_file_24"
-            app:icon="@drawable/ic_baseline_attach_file_24"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="end"
-            android:layout_weight="1"
-            />
-    </TableRow>
+            android:orientation="vertical"
+            android:padding="@dimen/common_spacing">
 
-    <TableRow>
+            <EditText
+                android:id="@+id/content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="200dp"
+                android:gravity="start|top"
+                android:hint="@string/post_input_text"
+                android:importantForAutofill="no"
+                android:inputType="textMultiLine" />
 
-        <EditText
-            android:id="@+id/videoLink"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            android:visibility="gone"
-            tools:visibility="visible"
-            android:hint="@string/input_video_link_here"
-            />
+            <LinearLayout
+                android:id="@+id/picLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
 
-    </TableRow>
+                <ImageView
+                    android:id="@+id/pic"
+                    android:layout_width="match_parent"
+                    android:layout_height="260dp"
+                    android:scaleType="centerCrop"
+                    tools:srcCompat="@tools:sample/avatars" />
 
+                <Button
+                    android:id="@+id/deletePic"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/clear" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
-
-
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/save_btn"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:srcCompat = "@drawable/ic_baseline_done_24"
-        android:layout_gravity="end"
-        android:layout_margin="@dimen/common_spacing"/>
+        android:background="?attr/colorPrimary"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-</TableLayout>
+        <ImageView
+            android:id="@+id/takeShotBtn"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:contentDescription="@string/take_photo"
+            android:padding="@dimen/common_spacing"
+            android:src="@drawable/ic_baseline_photo_camera_24"
+            app:tint="@android:color/white" />
+
+        <ImageView
+            android:id="@+id/pickPicBtn"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:contentDescription="@string/choose_from_gallery"
+            android:padding="@dimen/common_spacing"
+            android:src="@drawable/ic_baseline_photo_camera_back_24"
+            app:tint="@android:color/white" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

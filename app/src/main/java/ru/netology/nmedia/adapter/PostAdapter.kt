@@ -4,8 +4,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import androidx.core.view.isVisible
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.netology.nmedia.R
@@ -14,23 +15,24 @@ import ru.netology.nmedia.dto.Post
 
 interface OnInteractionListener {
     fun onLike(post: Post) {}
-    // УДАЛЕНО: fun onEdit(post: Post) {}
+    fun onEdit(post: Post) {}
     fun onRemove(post: Post) {}
     fun onShare(post: Post) {}
+    fun onImage(post: Post) {}
 }
 
 val BASE_URL = "http://10.0.2.2:9999"
 
 class PostAdapter(
     private val onInteractionListener: OnInteractionListener,
-) : ListAdapter<Post, PostViewHolder>(PostDiffCallback()) {
+) : PagingDataAdapter<Post, PostViewHolder>(PostDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = CardPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return PostViewHolder(binding, onInteractionListener)
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-        val post = getItem(position)
+        val post = getItem(position) ?: return
         holder.bind(post)
     }
 }
@@ -41,8 +43,13 @@ class PostViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(post: Post) {
-        getAvatars(post, binding)
-
+        getAvatars(post,binding)
+        if (post.attachment != null) {
+            binding.attachImage.visibility = View.VISIBLE
+            getAttachment(post,binding)
+        } else {
+            binding.attachImage.visibility = View.GONE
+        }
         if (!post.savedOnServer) {
             binding.like.visibility = View.INVISIBLE
             binding.share.visibility = View.INVISIBLE
@@ -50,7 +57,6 @@ class PostViewHolder(
             binding.like.visibility = View.VISIBLE
             binding.share.visibility = View.VISIBLE
         }
-
         if (post.savedOnServer) {
             binding.savedOnServer.setImageResource(R.drawable.ic_baseline_public_24)
         } else {
@@ -63,21 +69,29 @@ class PostViewHolder(
             content.text = post.content
             like.isChecked = post.likedByMe
             like.text = "${post.likes}"
+            menu.isVisible = post.ownedByMe
 
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
                     inflate(R.menu.post_menu)
-                    // УДАЛЕН пункт Edit из меню
                     setOnMenuItemClickListener { item ->
                         when (item.itemId) {
                             R.id.remove -> {
                                 onInteractionListener.onRemove(post)
                                 true
                             }
+                            R.id.edit -> {
+                                onInteractionListener.onEdit(post)
+                                true
+                            }
                             else -> false
                         }
                     }
                 }.show()
+            }
+
+            attachImage.setOnClickListener {
+                onInteractionListener.onImage(post)
             }
 
             like.setOnClickListener {
@@ -99,6 +113,14 @@ fun getAvatars(post: Post, binding: CardPostBinding) {
         .circleCrop()
         .timeout(10_000)
         .into(binding.avatar)
+}
+
+fun getAttachment(post: Post, binding: CardPostBinding) {
+    Glide.with(binding.attachImage)
+        .load(post.attachment?.url)
+        .error(R.drawable.ic_baseline_cancel_24)
+        .timeout(10_000)
+        .into(binding.attachImage)
 }
 
 class PostDiffCallback : DiffUtil.ItemCallback<Post>() {

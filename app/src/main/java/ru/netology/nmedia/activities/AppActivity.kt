@@ -1,18 +1,44 @@
 package ru.netology.nmedia.activities
 
+import android.content.DialogInterface
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.MenuProvider
 import androidx.navigation.findNavController
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activities.NewPostFragment.Companion.textArg
+import ru.netology.nmedia.auth.AppAuth
+import ru.netology.nmedia.viewmodel.AuthViewModel
+import ru.netology.nmedia.viewmodel.PostViewModel
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class AppActivity : AppCompatActivity(R.layout.activity_app) {
+
+    @Inject
+    lateinit var appAuth: AppAuth
+
+    @Inject
+    lateinit var firebaseMessaging: FirebaseMessaging
+
+    @Inject
+    lateinit var googleApiAvailability: GoogleApiAvailability
+
+    val viewModel: AuthViewModel by viewModels()
+
+    private val postViewModel: PostViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -37,10 +63,60 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
         }
 
         checkGoogleApiAvailability()
+
+        var currentMenuProvider: MenuProvider? = null
+        viewModel.data.observe(this) {
+            currentMenuProvider?.also { removeMenuProvider(it) }
+            addMenuProvider(object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(R.menu.menu_main, menu)
+                    val authorized = viewModel.authorized
+                    menu.setGroupVisible(R.id.authorized, authorized)
+                    menu.setGroupVisible(R.id.unAuthorized, !authorized)
+                }
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean  =
+                    when (menuItem.itemId) {
+                        R.id.signIn -> {
+                            findNavController(R.id.nav_host_fragment).navigate(R.id.action_feedFragment_to_signInFragment)
+                            true
+                        }
+                        R.id.signUp -> {
+                            findNavController(R.id.nav_host_fragment).navigate(R.id.action_feedFragment_to_registrationFragment)
+                            true
+                        }
+                        R.id.logout -> {
+                            showSignOutDialog()
+                            true
+                        }
+                        else -> false
+                    }
+            }.apply {
+                currentMenuProvider = this
+            })
+        }
+    }
+
+    private fun showSignOutDialog(){
+        val listener = DialogInterface.OnClickListener{ _, which->
+            when(which) {
+                DialogInterface.BUTTON_POSITIVE -> appAuth.removeAuth()
+                DialogInterface.BUTTON_NEGATIVE -> Toast.makeText(this, "ну и ладненько...", Toast.LENGTH_SHORT).show()
+            }
+        }
+        val dialog = AlertDialog.Builder(this)
+            .setCancelable(false)
+            .setTitle("Внимание!")
+            .setMessage("Вы точно хотите выйти?")
+            .setPositiveButton("Уверен!", listener)
+            .setNegativeButton("Нет", listener)
+            .create()
+
+        dialog.show()
     }
 
     private fun checkGoogleApiAvailability() {
-        with(GoogleApiAvailability.getInstance()) {
+        with(googleApiAvailability) {
             val code = isGooglePlayServicesAvailable(this@AppActivity)
             if (code == ConnectionResult.SUCCESS) {
                 return@with
@@ -53,7 +129,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                 .show()
         }
 
-        FirebaseMessaging.getInstance().token.addOnSuccessListener {
+        firebaseMessaging.token.addOnSuccessListener {
             println(it)
         }
     }

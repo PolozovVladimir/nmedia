@@ -1,11 +1,9 @@
-package ru.netology.nmedia.util
-
+package ru.netology.nmedia.view
 
 import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
-
 
 fun ImageView.load(url: String, vararg transforms: BitmapTransformation = emptyArray()) =
     Glide.with(this)

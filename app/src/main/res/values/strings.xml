@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Nmedia</string>
+    <string name="clear" translatable="false">Очистить</string>
+    <string name="take_photo" translatable="false">Сделать фото</string>
+    <string name="choose_from_gallery" translatable="false">Выбрать из галереи</string>
     <string name="nmedia">NMedia!</string>
     <string name="countOfLikes" translatable="false">10</string>
     <string name="countOfShares" translatable="false">5</string>

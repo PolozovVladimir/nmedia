@@ -1,7 +1,9 @@
 package ru.netology.nmedia.entity
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.android.gms.fido.fido2.api.common.Attachment
 import ru.netology.nmedia.dto.Post
 
 @Entity
@@ -9,37 +11,27 @@ data class PostEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long,
     val author: String,
+    val authorId: Long,
     val authorAvatar: String,
     val content: String,
     val published: String,
     val likedByMe: Boolean,
     val likes: Int = 0,
-    val savedOnServer: Boolean
-) {
-    fun toDto(): Post = Post(
-        id = id,
-        author = author,
-        authorAvatar = authorAvatar,
-        content = content,
-        published = published,
-        likedByMe = likedByMe,
-        likes = likes,
-        savedOnServer = savedOnServer
-    )
+    var toShow:Boolean,
+    val savedOnServer: Boolean,
+
+    @Embedded
+    val attachment: Attachment?,
+
+
+    ) {
+    fun toDto() = Post(id, author, authorId, authorAvatar, content, published, likedByMe, likes, toShow, attachment, savedOnServer)
 
     companion object {
-        fun fromDto(dto: Post): PostEntity = PostEntity(
-            id = dto.id,
-            author = dto.author,
-            authorAvatar = dto.authorAvatar,
-            content = dto.content,
-            published = dto.published,
-            likedByMe = dto.likedByMe,
-            likes = dto.likes,
-            savedOnServer = dto.savedOnServer
-        )
+        fun fromDto(dto: Post) =
+            PostEntity(dto.id, dto.author,dto.authorId, dto.authorAvatar, dto.content, dto.published, dto.likedByMe, dto.likes, dto.toShow,dto.savedOnServer, dto.attachment, )
+
     }
 }
-
-fun List<PostEntity>.toDto(): List<Post> = map { it.toDto() }
-fun List<Post>.toEntity(): List<PostEntity> = map { PostEntity.fromDto(it) }
+fun List<PostEntity>.toDto(): List<Post> = map(PostEntity::toDto)
+fun List<Post>.toEntity(): List<PostEntity> = map(PostEntity::fromDto)

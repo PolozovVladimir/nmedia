@@ -9,16 +9,22 @@ import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
-import java.lang.IllegalArgumentException
+import ru.netology.nmedia.auth.AppAuth
+import ru.netology.nmedia.dto.Notify
+import javax.inject.Inject
 import kotlin.random.Random
 
-
+@AndroidEntryPoint
 class FCMService : FirebaseMessagingService() {
     private val action = "action"
     private val content = "content"
     private val channelId = "remote"
     private val gson = Gson()
+
+    @Inject
+    lateinit var  appAuth: AppAuth
 
     override fun onCreate() {
         super.onCreate()
@@ -35,25 +41,35 @@ class FCMService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
+        val notify: Notify = gson.fromJson(message.data[content], Notify::class.java)
+        val recipientId = notify.recipientId
+        val myId = appAuth.getId()
 
-        message.data[action]?.let {
-            when (Action.getValidAction(it)) {
-                Action.LIKE -> handleLike(gson.fromJson(message.data[content], Like::class.java))
-                Action.NEW_POST -> handleNewPost(
-                    gson.fromJson(
-                        message.data[content],
-                        NewPost::class.java
-                    )
-
-                )
-                Action.ERROR -> println("ERROR_PUSH")
-            }
+        when {
+            recipientId == null || recipientId == myId -> handleNotify(notify.content)
+            recipientId != myId -> appAuth.sendPushToken()
         }
+
+//        message.data[action]?.let {
+//            when (Action.getValidAction(it)) {
+//                Action.LIKE -> handleLike(gson.fromJson(message.data[content], Like::class.java))
+//                Action.NEW_POST -> handleNewPost(
+//                    gson.fromJson(
+//                        message.data[content],
+//                        NewPost::class.java
+//                    )
+//
+//                )
+//                Action.ERROR -> println("ERROR_PUSH")
+//            }
+//
+//        }
+
     }
 
 
     override fun onNewToken(token: String) {
-        println(token)
+        appAuth.sendPushToken(token)
     }
 
     private fun handleLike(content: Like) {
@@ -93,6 +109,17 @@ class FCMService : FirebaseMessagingService() {
         NotificationManagerCompat.from(this)
             .notify(Random.nextInt(100_000), notification)
     }
+
+    private fun handleNotify(content: String){
+        val notification = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.drawable.ic_baseline_notifications_24)
+            .setContentText(content)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .build()
+
+        NotificationManagerCompat.from(this)
+            .notify(Random.nextInt(100_000), notification)
+    }
 }
 
 enum class Action {
@@ -120,5 +147,4 @@ data class NewPost(
     val postAuthor: String,
     val postText: String,
     val postTopic: String
-
 )
