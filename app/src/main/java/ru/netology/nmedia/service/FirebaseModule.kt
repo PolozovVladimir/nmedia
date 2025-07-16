@@ -1,8 +1,8 @@
 package ru.netology.nmedia.service
 
-import com.google.android.datatransport.runtime.dagger.Module
-import com.google.android.datatransport.runtime.dagger.Provides
 import com.google.firebase.messaging.FirebaseMessaging
+import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
@@ -11,8 +11,7 @@ import javax.inject.Singleton
 @Module
 class FirebaseModule {
 
-    @Singleton
     @Provides
-    fun provideFireBaseMessaging():
-            FirebaseMessaging = FirebaseMessaging.getInstance()
+    @Singleton
+    fun provideFirebaseMessaging(): FirebaseMessaging = FirebaseMessaging.getInstance()
 }

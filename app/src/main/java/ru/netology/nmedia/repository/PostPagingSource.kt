@@ -1,6 +1,5 @@
 package ru.netology.nmedia.repository
 
-import android.graphics.pdf.LoadParams
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.bumptech.glide.load.HttpException
@@ -28,7 +27,7 @@ class PostPagingSource(
             }
 
             if (!result.isSuccessful) {
-                throw  HttpException(result)
+                throw retrofit2.HttpException(result)
             }
 
             val data = result.body().orEmpty()

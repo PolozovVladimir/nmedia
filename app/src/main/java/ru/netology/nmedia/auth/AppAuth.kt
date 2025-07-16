@@ -30,18 +30,17 @@ class AppAuth @Inject constructor(
 
     private val _authStateFlow: MutableStateFlow<AuthState>
 
-
     init {
         val token = prefs.getString(tokenKey, null)
         val id = prefs.getLong(idKey, 0L)
 
-        if (token == null || id == 0L){
+        if (token == null || id == 0L) {
             _authStateFlow = MutableStateFlow(AuthState())
-            with(prefs.edit()){
+            with(prefs.edit()) {
                 clear()
                 apply()
             }
-        } else{
+        } else {
             _authStateFlow = MutableStateFlow(AuthState(id, token))
         }
     }
@@ -59,19 +58,13 @@ class AppAuth @Inject constructor(
     }
 
     @Synchronized
-    fun setAuth(id:Long, token: String) {
+    fun setAuth(id: Long, token: String) {
         _authStateFlow.value = AuthState(id, token)
         prefs.edit {
             putString(tokenKey, token)
             putLong(idKey, id)
         }
         sendPushToken()
-    }
-
-    @InstallIn(SingletonComponent::class)
-    @EntryPoint
-    interface AppAuthEntryPoint {
-        fun getApiService(): ApiService
     }
 
     fun sendPushToken(token: String? = null) {
@@ -82,14 +75,17 @@ class AppAuth @Inject constructor(
                 entryPoint.getApiService().sendPushToken(pushToken)
             } catch (e: Exception) {
                 e.printStackTrace()
-
             }
-
         }
     }
 
-    fun getId(): Long = prefs.getLong(idKey, 0L)
+    @InstallIn(SingletonComponent::class)
+    @EntryPoint
+    interface AppAuthEntryPoint {
+        fun getApiService(): ApiService
+    }
 
+    fun getId(): Long = prefs.getLong(idKey, 0L)
 }
 
-data class AuthState(val id:Long = 0, val token: String? = null)
+data class AuthState(val id: Long = 0, val token: String? = null)

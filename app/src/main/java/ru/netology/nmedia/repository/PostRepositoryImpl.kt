@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.api.ApiService
 import ru.netology.nmedia.appError.ApiError
 import ru.netology.nmedia.appError.AppError
@@ -24,8 +25,6 @@ import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.dto.MediaUpload
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.entity.PostEntity
-import ru.netology.nmedia.entity.toDto
-import ru.netology.nmedia.entity.toEntity
 import java.io.IOException
 import javax.inject.Inject
 
@@ -37,9 +36,7 @@ class PostRepositoryImpl @Inject constructor(
     override val data = Pager(
         config = PagingConfig(pageSize = 10, enablePlaceholders = false),
         pagingSourceFactory = {
-            PostPagingSource(
-                apiService
-            )
+            PostPagingSource(apiService)
         }
     ).flow
 
@@ -50,11 +47,14 @@ class PostRepositoryImpl @Inject constructor(
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            for (i in body) {
-                i.toShow = true
-                i.savedOnServer = true
+
+            val entities = body.map { postDto ->
+                PostEntity.fromDto(postDto).copy(
+                    toShow = true,
+                    savedOnServer = true
+                )
             }
-            dao.insert(body.toEntity())
+            dao.insert(entities)
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -75,16 +75,18 @@ class PostRepositoryImpl @Inject constructor(
             }
 
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            for (i in body) {
-                i.toShow = false
+
+            val entities = body.map { postDto ->
+                PostEntity.fromDto(postDto).copy(
+                    toShow = false
+                )
             }
-            dao.insert(body.toEntity())
+            dao.insert(entities)
             emit(body.size)
         }
     }
         .catch { e -> throw AppError.from(e) }
         .flowOn(Dispatchers.Default)
-
 
     override suspend fun save(post: Post) {
         try {
@@ -93,22 +95,25 @@ class PostRepositoryImpl @Inject constructor(
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            body.toShow = true
-            body.savedOnServer = true
-            dao.insert(PostEntity.fromDto(body))
+
+            dao.insert(PostEntity.fromDto(body).copy(
+                toShow = true,
+                savedOnServer = true
+            ))
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
             throw UnknownError
         }
-
     }
 
     override suspend fun saveWithAttachment(post: Post, upload: MediaUpload) {
         try {
-            val file = uploadFile(upload)
+            val media = uploadFile(upload)
+            val url = "${BuildConfig.BASE_URL}media/${media.id}"
+
             val postWithAttachment = post.copy(
-                attachment = Attachment(file.id, AttachmentType.IMAGE),
+                attachment = Attachment(url, AttachmentType.IMAGE),
                 toShow = true,
                 savedOnServer = true
             )
@@ -129,14 +134,12 @@ class PostRepositoryImpl @Inject constructor(
             )
             val response = apiService.uploadPic(part)
             return response.body() ?: throw ApiError(response.code(), response.message())
-
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
             throw UnknownError
         }
     }
-
 
     override suspend fun likeById(id: Long) {
         dao.likeById(id)
@@ -146,8 +149,8 @@ class PostRepositoryImpl @Inject constructor(
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(PostEntity.fromDto(body).apply { toShow = true })
 
+            dao.insert(PostEntity.fromDto(body).copy(toShow = true))
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -163,16 +166,14 @@ class PostRepositoryImpl @Inject constructor(
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(PostEntity.fromDto(body).apply { toShow = true })
 
+            dao.insert(PostEntity.fromDto(body).copy(toShow = true))
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
             throw UnknownError
         }
-
     }
-
 
     override suspend fun removeById(id: Long) {
         dao.removeById(id)
@@ -181,13 +182,11 @@ class PostRepositoryImpl @Inject constructor(
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
-
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
             throw UnknownError
         }
-
     }
 
     override suspend fun updateUser(login: String, pass: String) {
@@ -196,17 +195,12 @@ class PostRepositoryImpl @Inject constructor(
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
-            val body = response.body()?: throw ApiError(response.code(), response.message())
-            val id = body.id
-            val token = body.token
-            appAuth.setAuth(id,token)
-
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            appAuth.setAuth(body.id, body.token)
         } catch (e: IOException) {
             throw NetworkError
-        }catch (e: Exception) {
-            println(e)
+        } catch (e: Exception) {
             throw UnknownError
-
         }
     }
 
@@ -216,18 +210,12 @@ class PostRepositoryImpl @Inject constructor(
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
-            val body = response.body()?: throw ApiError(response.code(), response.message())
-            val id = body.id
-            val token = body.token
-            appAuth.setAuth(id,token)
-
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            appAuth.setAuth(body.id, body.token)
         } catch (e: IOException) {
             throw NetworkError
-        }catch (e: Exception) {
-            println(e)
+        } catch (e: Exception) {
             throw UnknownError
-
         }
     }
-
 }
