@@ -2,15 +2,21 @@ package ru.netology.nmedia.repository
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.bumptech.glide.load.HttpException
+import retrofit2.HttpException
 import ru.netology.nmedia.api.ApiService
 import ru.netology.nmedia.dto.Post
 import java.io.IOException
 
 class PostPagingSource(
     private val apiService: ApiService
-): PagingSource<Long, Post>() {
-    override fun getRefreshKey(state: PagingState<Long, Post>): Long? = null
+) : PagingSource<Long, Post>() {
+
+    override fun getRefreshKey(state: PagingState<Long, Post>): Long? {
+        return state.anchorPosition?.let { anchorPosition ->
+            state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
+                ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
+        }
+    }
 
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, Post> {
         try {
@@ -19,24 +25,47 @@ class PostPagingSource(
                     apiService.getLatest(params.loadSize)
                 }
                 is LoadParams.Append -> {
-                    apiService.getBefore(id = params.key, count = params.loadSize)
+                    val id = params.key ?: return LoadResult.Page(
+                        data = emptyList(),
+                        prevKey = null,
+                        nextKey = null
+                    )
+                    apiService.getBefore(id, params.loadSize)
                 }
-                is LoadParams.Prepend -> return LoadResult.Page(
-                    data = emptyList(), nextKey = null, prevKey = params.key
-                )
+                is LoadParams.Prepend -> {
+                    val id = params.key ?: return LoadResult.Page(
+                        data = emptyList(),
+                        prevKey = null,
+                        nextKey = null
+                    )
+                    apiService.getAfter(id, params.loadSize)
+                }
             }
 
             if (!result.isSuccessful) {
-                throw retrofit2.HttpException(result)
+                return LoadResult.Error(HttpException(result))
             }
 
-            val data = result.body().orEmpty()
+            val data = result.body() ?: emptyList()
+            if (data.isEmpty()) {
+                return LoadResult.Page(
+                    data = emptyList(),
+                    prevKey = null,
+                    nextKey = null
+                )
+            }
+
+            val nextKey = data.last().id
+            val prevKey = data.first().id
+
             return LoadResult.Page(
                 data = data,
-                prevKey = params.key,
-                nextKey = data.lastOrNull()?.id
+                prevKey = if (prevKey == 0L) null else prevKey,
+                nextKey = nextKey
             )
-        }catch (e: IOException){
+        } catch (e: IOException) {
+            return LoadResult.Error(e)
+        } catch (e: Exception) {
             return LoadResult.Error(e)
         }
     }

@@ -9,6 +9,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Post
@@ -43,25 +44,27 @@ class PostViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(post: Post) {
-        getAvatars(post,binding)
+        Glide.with(binding.avatar)
+            .load("${BuildConfig.BASE_URL}avatars/${post.authorAvatar}")
+            .placeholder(R.drawable.ic_baseline_man_24)
+            .error(R.drawable.ic_baseline_cancel_24)
+            .circleCrop()
+            .timeout(10_000)
+            .into(binding.avatar)
+
         if (post.attachment != null) {
             binding.attachImage.visibility = View.VISIBLE
-            getAttachment(post,binding)
+            Glide.with(binding.attachImage)
+                .load(post.attachment!!.url)
+                .error(R.drawable.ic_baseline_cancel_24)
+                .timeout(10_000)
+                .into(binding.attachImage)
         } else {
             binding.attachImage.visibility = View.GONE
         }
-        if (!post.savedOnServer) {
-            binding.like.visibility = View.INVISIBLE
-            binding.share.visibility = View.INVISIBLE
-        } else {
-            binding.like.visibility = View.VISIBLE
-            binding.share.visibility = View.VISIBLE
-        }
-        if (post.savedOnServer) {
-            binding.savedOnServer.setImageResource(R.drawable.ic_baseline_public_24)
-        } else {
-            binding.savedOnServer.setImageResource(R.drawable.ic_baseline_public_off_24)
-        }
+
+        binding.like.visibility = View.VISIBLE
+        binding.share.visibility = View.VISIBLE
 
         binding.apply {
             author.text = post.author

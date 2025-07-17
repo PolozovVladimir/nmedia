@@ -18,52 +18,52 @@ import ru.netology.nmedia.dto.PushToken
 import ru.netology.nmedia.dto.Token
 
 interface ApiService {
-    @POST("users/push-tokens")
+    @POST("api/users/push-tokens")
     suspend fun sendPushToken(@Body token: PushToken): Response<Unit>
 
-    @GET("posts")
+    @GET("api/posts")
     suspend fun getAll(): Response<List<Post>>
 
-    @GET("posts/latest")
+    @GET("api/posts/latest")
     suspend fun getLatest(@Query("count") count: Int): Response<List<Post>>
 
-    @GET("posts/{id}/newer")
+    @GET("api/posts/{id}/newer")
     suspend fun getNewer(@Path("id") id: Long): Response<List<Post>>
 
-    @GET("posts/{id}/before")
+    @GET("api/posts/{id}/before")
     suspend fun getBefore(@Path("id") id: Long, @Query("count") count: Int): Response<List<Post>>
 
-    @GET("posts/{id}/after")
+    @GET("api/posts/{id}/after")
     suspend fun getAfter(@Path("id") id: Long, @Query("count") count: Int): Response<List<Post>>
 
-    @GET("posts/{id}")
+    @GET("api/posts/{id}")
     suspend fun getById(@Path("id") id: Long): Response<Post>
 
-    @POST("posts")
+    @POST("api/posts")
     suspend fun save(@Body post: Post): Response<Post>
 
-    @DELETE("posts/{id}")
+    @DELETE("api/posts/{id}")
     suspend fun removeById(@Path("id") id: Long): Response<Unit>
 
-    @POST("posts/{id}/likes")
+    @POST("api/posts/{id}/likes")
     suspend fun likeById(@Path("id") id: Long): Response<Post>
 
-    @DELETE("posts/{id}/likes")
+    @DELETE("api/posts/{id}/likes")
     suspend fun dislikeById(@Path("id") id: Long): Response<Post>
 
     @Multipart
-    @POST("media")
+    @POST("api/media")
     suspend fun uploadPic(@Part media: MultipartBody.Part): Response<Media>
 
     @FormUrlEncoded
-    @POST("users/authentication")
+    @POST("api/users/authentication")
     suspend fun updateUser(
         @Field("login") login: String,
         @Field("pass") pass: String
     ): Response<Token>
 
     @FormUrlEncoded
-    @POST("users/registration")
+    @POST("api/users/registration")
     suspend fun registerUser(
         @Field("login") login: String,
         @Field("pass") pass: String,

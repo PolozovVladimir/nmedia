@@ -43,7 +43,8 @@ private val noPhoto = PhotoModel()
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class PostViewModel @Inject constructor(
+class
+PostViewModel @Inject constructor(
     private val repository: PostRepository,
     appAuth: AppAuth
 ) : ViewModel() {
