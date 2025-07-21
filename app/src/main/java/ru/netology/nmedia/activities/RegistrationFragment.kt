@@ -5,17 +5,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.databinding.FragmentRegistrationBinding
+import ru.netology.nmedia.viewmodel.PostViewModel
 import ru.netology.nmedia.viewmodel.RegistrationViewModel
 
 @AndroidEntryPoint
 class RegistrationFragment : Fragment() {
 
     private val viewModel: RegistrationViewModel by viewModels()
+    private val postViewModel: PostViewModel by activityViewModels()
     private lateinit var binding: FragmentRegistrationBinding
 
     override fun onCreateView(
@@ -43,6 +46,7 @@ class RegistrationFragment : Fragment() {
 
         viewModel.tokenReceived.observe(viewLifecycleOwner) {
             if (it == 0) {
+                postViewModel.refresh()
                 findNavController().navigateUp()
             } else {
                 Snackbar.make(binding.root, "Ошибка регистрации", Snackbar.LENGTH_LONG).show()

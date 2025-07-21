@@ -24,6 +24,9 @@ interface ApiService {
     @GET("api/posts")
     suspend fun getAll(): Response<List<Post>>
 
+    @GET("latest")
+    suspend fun getLatest(): Response<List<Post>>
+
     @GET("api/posts/latest")
     suspend fun getLatest(@Query("count") count: Int): Response<List<Post>>
 
