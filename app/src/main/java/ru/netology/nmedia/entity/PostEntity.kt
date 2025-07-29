@@ -23,6 +23,20 @@ data class PostEntity(
     @Embedded
     val attachment: Attachment? = null
 ) {
+    fun toDto() = Post(
+        id = id,
+        author = author,
+        authorId = authorId,
+        authorAvatar = authorAvatar,
+        content = content,
+        published = published,
+        likedByMe = likedByMe,
+        likes = likes,
+        toShow = toShow,
+        attachment = attachment,
+        savedOnServer = savedOnServer
+    )
+
     companion object {
         fun fromDto(dto: Post) = PostEntity(
             id = dto.id,
@@ -39,3 +53,6 @@ data class PostEntity(
         )
     }
 }
+
+fun List<PostEntity>.toDto(): List<Post> = map(PostEntity::toDto)
+fun List<Post>.toEntity(): List<PostEntity> = map(PostEntity::fromDto)

@@ -45,6 +45,7 @@ class SignInFragment : Fragment() {
 
         viewModel.tokenReceived.observe(viewLifecycleOwner) {
             if (it == 0) {
+                // Обновляем данные после успешного входа
                 postViewModel.refresh()
                 findNavController().navigateUp()
             } else {

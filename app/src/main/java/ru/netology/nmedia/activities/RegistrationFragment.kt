@@ -46,6 +46,7 @@ class RegistrationFragment : Fragment() {
 
         viewModel.tokenReceived.observe(viewLifecycleOwner) {
             if (it == 0) {
+                // Обновляем данные после успешной регистрации
                 postViewModel.refresh()
                 findNavController().navigateUp()
             } else {

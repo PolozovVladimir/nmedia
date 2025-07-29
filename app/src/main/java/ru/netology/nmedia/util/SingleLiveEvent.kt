@@ -26,4 +26,4 @@ class SingleLiveEvent<T> : MutableLiveData<T>() {
         pending.set(true)
         super.setValue(t)
     }
-}
+} 
