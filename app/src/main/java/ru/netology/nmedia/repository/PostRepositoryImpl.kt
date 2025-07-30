@@ -1,7 +1,9 @@
 package ru.netology.nmedia.repository
 
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.map
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -29,16 +31,20 @@ import java.io.IOException
 import javax.inject.Inject
 
 class PostRepositoryImpl @Inject constructor(
-    private val dao: PostDao,
+    private val postDao: PostDao,
     private val apiService: ApiService,
     private val appAuth: AppAuth
 ) : PostRepository {
+
+    @OptIn(ExperimentalPagingApi::class)
     override val data = Pager(
         config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-        pagingSourceFactory = {
-            PostPagingSource(apiService)
-        }
+        pagingSourceFactory = { postDao.getPagingSource() },
+        remoteMediator = PostRemoteMediator(apiService, postDao)
     ).flow
+        .map { pagingData ->
+            pagingData.map(PostEntity::toDto)
+        }
 
     override suspend fun getAll() {
         try {
@@ -54,7 +60,7 @@ class PostRepositoryImpl @Inject constructor(
                     savedOnServer = true
                 )
             }
-            dao.insert(entities)
+            postDao.insert(entities)
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -63,7 +69,7 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateShownStatus() {
-        dao.updateShownStatus()
+        postDao.updateShownStatus()
     }
 
     override fun getNewerCount(id: Long): Flow<Int> = flow {
@@ -81,12 +87,16 @@ class PostRepositoryImpl @Inject constructor(
                     toShow = false
                 )
             }
-            dao.insert(entities)
+            postDao.insert(entities)
             emit(body.size)
         }
     }
         .catch { e -> throw AppError.from(e) }
         .flowOn(Dispatchers.Default)
+
+    override suspend fun clear() {
+        postDao.clear()
+    }
 
     override suspend fun save(post: Post) {
         try {
@@ -96,7 +106,7 @@ class PostRepositoryImpl @Inject constructor(
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
 
-            dao.insert(PostEntity.fromDto(body).copy(
+            postDao.insert(PostEntity.fromDto(body).copy(
                 toShow = true,
                 savedOnServer = true
             ))
@@ -142,7 +152,7 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override suspend fun likeById(id: Long) {
-        dao.likeById(id)
+        postDao.likeById(id)
         try {
             val response = apiService.likeById(id)
             if (!response.isSuccessful) {
@@ -150,7 +160,7 @@ class PostRepositoryImpl @Inject constructor(
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
 
-            dao.insert(PostEntity.fromDto(body).copy(toShow = true))
+            postDao.insert(PostEntity.fromDto(body).copy(toShow = true))
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -159,7 +169,7 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override suspend fun dislikeById(id: Long) {
-        dao.likeById(id)
+        postDao.likeById(id)
         try {
             val response = apiService.dislikeById(id)
             if (!response.isSuccessful) {
@@ -167,7 +177,7 @@ class PostRepositoryImpl @Inject constructor(
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
 
-            dao.insert(PostEntity.fromDto(body).copy(toShow = true))
+            postDao.insert(PostEntity.fromDto(body).copy(toShow = true))
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -176,7 +186,7 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override suspend fun removeById(id: Long) {
-        dao.removeById(id)
+        postDao.removeById(id)
         try {
             val response = apiService.removeById(id)
             if (!response.isSuccessful) {

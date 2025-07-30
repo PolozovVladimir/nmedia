@@ -18,5 +18,5 @@ interface PostRepository {
     suspend fun updateShownStatus()
     suspend fun updateUser(login: String, pass: String)
     suspend fun registerUser(login: String, pass: String, name: String)
-
+    suspend fun clear()
 }

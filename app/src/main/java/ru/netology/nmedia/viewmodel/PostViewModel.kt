@@ -71,9 +71,6 @@ class PostViewModel @Inject constructor(
     val photo: LiveData<PhotoModel?>
         get() = _photo
 
-    init {
-        loadPosts()
-    }
 
     fun loadPosts() = viewModelScope.launch {
         _dataState.value = FeedModelState(loading = true)
@@ -85,7 +82,6 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    // Добавлен метод для обновления данных
     fun refresh() = viewModelScope.launch {
         try {
             _dataState.value = FeedModelState(refreshing = true)

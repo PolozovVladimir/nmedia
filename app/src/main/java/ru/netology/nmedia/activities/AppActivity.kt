@@ -38,7 +38,6 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
     val viewModel: AuthViewModel by viewModels()
     private val postViewModel: PostViewModel by viewModels()
 
-    // Добавляем флаг для отслеживания предыдущего состояния авторизации
     private var wasAuthorized: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,7 +69,6 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
         viewModel.data.observe(this) {
             val isAuthorized = viewModel.authorized
 
-            // Проверяем изменение состояния авторизации
             if (wasAuthorized != isAuthorized) {
                 postViewModel.refresh()
                 wasAuthorized = isAuthorized
@@ -105,7 +103,6 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
             })
         }
 
-        // Инициализируем флаг текущим состоянием
         wasAuthorized = viewModel.authorized
     }
 
@@ -114,8 +111,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
             when(which) {
                 DialogInterface.BUTTON_POSITIVE -> {
                     appAuth.removeAuth()
-                    // Обновляем данные после логаута
-                    postViewModel.refresh()
+                    postViewModel.clear()
                 }
                 DialogInterface.BUTTON_NEGATIVE -> Toast.makeText(this, "ну и ладненько...", Toast.LENGTH_SHORT).show()
             }
