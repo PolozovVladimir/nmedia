@@ -17,7 +17,6 @@ data class PostEntity(
     val published: String,
     val likedByMe: Boolean,
     val likes: Int = 0,
-    var toShow: Boolean,
     val savedOnServer: Boolean,
 
     @Embedded
@@ -32,7 +31,6 @@ data class PostEntity(
         published = published,
         likedByMe = likedByMe,
         likes = likes,
-        toShow = toShow,
         attachment = attachment,
         savedOnServer = savedOnServer
     )
@@ -47,7 +45,6 @@ data class PostEntity(
             published = dto.published,
             likedByMe = dto.likedByMe,
             likes = dto.likes,
-            toShow = dto.toShow,
             savedOnServer = dto.savedOnServer,
             attachment = dto.attachment
         )

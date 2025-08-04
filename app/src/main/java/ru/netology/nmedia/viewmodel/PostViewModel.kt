@@ -34,7 +34,6 @@ private val empty = Post(
     likedByMe = false,
     likes = 0,
     published = "",
-    toShow = false,
     attachment = null,
     savedOnServer = false
 )
@@ -144,12 +143,6 @@ class PostViewModel @Inject constructor(
             } catch (e: Exception) {
                 _dataState.value = FeedModelState(error = true)
             }
-        }
-    }
-
-    fun updateShownStatus() {
-        viewModelScope.launch {
-            repository.updateShownStatus()
         }
     }
 

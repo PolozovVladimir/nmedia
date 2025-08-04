@@ -1,15 +1,20 @@
 package ru.netology.nmedia.activities
 
+import android.Manifest
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.navigation.findNavController
 import com.google.android.gms.common.ConnectionResult
@@ -40,28 +45,24 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
 
     private var wasAuthorized: Boolean = false
 
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (!isGranted) {
+            Toast.makeText(
+                this,
+                "Уведомления будут недоступны",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        intent?.let {
-            if (it.action != Intent.ACTION_SEND) {
-                return@let
-            }
+        checkNotificationPermission()
 
-            val text = it.getStringExtra(Intent.EXTRA_TEXT)
-            if (text?.isNotBlank() != true) {
-                return@let
-            }
-
-            intent.removeExtra(Intent.EXTRA_TEXT)
-            findNavController(R.id.nav_host_fragment)
-                .navigate(
-                    R.id.action_feedFragment_to_newPostFragment,
-                    Bundle().apply {
-                        textArg = text
-                    }
-                )
-        }
+        handleIntent(intent)
 
         checkGoogleApiAvailability()
 
@@ -106,14 +107,56 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
         wasAuthorized = viewModel.authorized
     }
 
-    private fun showSignOutDialog(){
-        val listener = DialogInterface.OnClickListener{ _, which->
-            when(which) {
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent?) {
+        intent?.let {
+            if (it.action != Intent.ACTION_SEND) {
+                return@let
+            }
+
+            val text = it.getStringExtra(Intent.EXTRA_TEXT)
+            if (text?.isNotBlank() != true) {
+                return@let
+            }
+
+            intent.removeExtra(Intent.EXTRA_TEXT)
+            findNavController(R.id.nav_host_fragment)
+                .navigate(
+                    R.id.action_feedFragment_to_newPostFragment,
+                    Bundle().apply {
+                        textArg = text
+                    }
+                )
+        }
+    }
+
+    private fun checkNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
+    private fun showSignOutDialog() {
+        val listener = DialogInterface.OnClickListener { _, which ->
+            when (which) {
                 DialogInterface.BUTTON_POSITIVE -> {
                     appAuth.removeAuth()
-                    postViewModel.clear()
                 }
-                DialogInterface.BUTTON_NEGATIVE -> Toast.makeText(this, "ну и ладненько...", Toast.LENGTH_SHORT).show()
+                DialogInterface.BUTTON_NEGATIVE -> Toast.makeText(
+                    this,
+                    "ну и ладненько...",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
         val dialog = AlertDialog.Builder(this)
@@ -137,8 +180,11 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                 getErrorDialog(this@AppActivity, code, 9000)?.show()
                 return
             }
-            Toast.makeText(this@AppActivity, R.string.google_play_unavailable, Toast.LENGTH_LONG)
-                .show()
+            Toast.makeText(
+                this@AppActivity,
+                R.string.google_play_unavailable,
+                Toast.LENGTH_LONG
+            ).show()
         }
 
         firebaseMessaging.token.addOnSuccessListener {
