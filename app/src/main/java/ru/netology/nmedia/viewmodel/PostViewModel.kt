@@ -50,8 +50,8 @@ class PostViewModel @Inject constructor(
     val data: Flow<PagingData<Post>> = appAuth.authStateFlow
         .flatMapLatest { (id, _) ->
             repository.data
-                .map { posts ->
-                    posts.map {
+                .map { pagingData ->
+                    pagingData.map {
                         it.copy(ownedByMe = it.authorId == id)
                     }
                 }
@@ -69,27 +69,6 @@ class PostViewModel @Inject constructor(
     private var _photo = MutableLiveData<PhotoModel?>(null)
     val photo: LiveData<PhotoModel?>
         get() = _photo
-
-
-    fun loadPosts() = viewModelScope.launch {
-        _dataState.value = FeedModelState(loading = true)
-        try {
-            repository.getAll()
-            _dataState.value = FeedModelState(idle = true)
-        } catch (e: Exception) {
-            _dataState.value = FeedModelState(error = true)
-        }
-    }
-
-    fun refresh() = viewModelScope.launch {
-        try {
-            _dataState.value = FeedModelState(refreshing = true)
-            repository.getAll()
-            _dataState.value = FeedModelState(idle = true)
-        } catch (e: Exception) {
-            _dataState.value = FeedModelState(error = true)
-        }
-    }
 
     fun save() {
         edited.value?.let { post ->

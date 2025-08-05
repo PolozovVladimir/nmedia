@@ -27,12 +27,11 @@ class PostRemoteMediator(
         try {
             val response = when (loadType) {
                 LoadType.REFRESH -> {
-                    val latestId = postDao.getMaxId()
-
-                    if (latestId == null) {
+                    val maxId = postDao.getMaxId()
+                    if (maxId == null) {
                         apiService.getLatest(state.config.pageSize)
                     } else {
-                        apiService.getAfter(latestId, state.config.pageSize)
+                        apiService.getAfter(maxId, state.config.pageSize)
                     }
                 }
 

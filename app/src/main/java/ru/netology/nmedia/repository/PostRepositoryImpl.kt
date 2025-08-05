@@ -24,6 +24,7 @@ import ru.netology.nmedia.dto.AttachmentType
 import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.dto.MediaUpload
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.dto.Token
 import ru.netology.nmedia.entity.PostEntity
 import java.io.IOException
 import javax.inject.Inject
@@ -38,37 +39,13 @@ class PostRepositoryImpl @Inject constructor(
     @OptIn(ExperimentalPagingApi::class)
     override val data = Pager(
         config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-        pagingSourceFactory = { postDao.getPagingSource() },
-        remoteMediator = PostRemoteMediator(apiService, appDb)
+        remoteMediator = PostRemoteMediator(apiService, appDb),
+        pagingSourceFactory = { postDao.getPagingSource() }
     ).flow
         .map { pagingData ->
             pagingData.map(PostEntity::toDto)
         }
-
-    override suspend fun getAll() {
-        try {
-            val response = apiService.getAll()
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
-            }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-
-            val entities = body.map { postDto ->
-                PostEntity.fromDto(postDto).copy(
-                    savedOnServer = true
-                )
-            }
-            postDao.insert(entities)
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
-        }
-    }
-
-    override suspend fun clear() {
-        postDao.clear()
-    }
+        .flowOn(Dispatchers.Default)
 
     override suspend fun save(post: Post) {
         try {
@@ -168,6 +145,11 @@ class PostRepositoryImpl @Inject constructor(
             throw UnknownError
         }
     }
+
+    override suspend fun clear() {
+        postDao.clear()
+    }
+
     override suspend fun updateUser(login: String, pass: String) {
         try {
             val response = apiService.updateUser(login, pass)
@@ -197,5 +179,4 @@ class PostRepositoryImpl @Inject constructor(
             throw UnknownError
         }
     }
-
 }

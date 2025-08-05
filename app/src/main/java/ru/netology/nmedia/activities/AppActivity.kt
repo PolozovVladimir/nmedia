@@ -71,7 +71,6 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
             val isAuthorized = viewModel.authorized
 
             if (wasAuthorized != isAuthorized) {
-                postViewModel.refresh()
                 wasAuthorized = isAuthorized
             }
 

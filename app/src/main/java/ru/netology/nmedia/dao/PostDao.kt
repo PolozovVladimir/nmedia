@@ -16,17 +16,11 @@ interface PostDao {
     @Query("SELECT * FROM PostEntity ORDER BY id DESC")
     fun getPagingSource(): PagingSource<Int, PostEntity>
 
-    @Query("SELECT MAX(id) FROM PostEntity")
-    suspend fun getMaxId(): Long?
-
     @Query("SELECT COUNT(*) == 0 FROM PostEntity")
     suspend fun isEmpty(): Boolean
 
-    @Query("SELECT id FROM PostEntity")
-    suspend fun getAllIds(): List<Long>
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(post: PostEntity):Long
+    suspend fun insert(post: PostEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(posts: List<PostEntity>)
@@ -50,4 +44,10 @@ interface PostDao {
 
     @Query("DELETE FROM PostEntity WHERE id = :id")
     suspend fun removeById(id: Long)
+
+    @Query("SELECT MAX(id) FROM PostEntity")
+    suspend fun getMaxId(): Long?
+
+    @Query("SELECT id FROM PostEntity")
+    suspend fun getAllIds(): List<Long>
 }

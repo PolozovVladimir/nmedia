@@ -46,8 +46,6 @@ class RegistrationFragment : Fragment() {
 
         viewModel.tokenReceived.observe(viewLifecycleOwner) {
             if (it == 0) {
-                // Обновляем данные после успешной регистрации
-                postViewModel.refresh()
                 findNavController().navigateUp()
             } else {
                 Snackbar.make(binding.root, "Ошибка регистрации", Snackbar.LENGTH_LONG).show()

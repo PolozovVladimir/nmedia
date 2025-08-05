@@ -45,8 +45,6 @@ class SignInFragment : Fragment() {
 
         viewModel.tokenReceived.observe(viewLifecycleOwner) {
             if (it == 0) {
-                // Обновляем данные после успешного входа
-                postViewModel.refresh()
                 findNavController().navigateUp()
             } else {
                 Snackbar.make(binding.root, "Неверный пароль или логин", Snackbar.LENGTH_LONG).show()
