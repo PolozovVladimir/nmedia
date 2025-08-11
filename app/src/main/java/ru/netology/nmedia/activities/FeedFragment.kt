@@ -5,17 +5,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.ConcatAdapter
+import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostAdapter
+import ru.netology.nmedia.adapter.PostsLoadStateAdapter
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.dto.Post
@@ -75,7 +78,11 @@ class FeedFragment : Fragment() {
             }
         })
 
-        binding.list.adapter = adapter
+        val headerAdapter = PostsLoadStateAdapter { adapter.retry() }
+        val footerAdapter = PostsLoadStateAdapter { adapter.retry() }
+        val concatAdapter = ConcatAdapter(headerAdapter, adapter, footerAdapter)
+
+        binding.list.adapter = concatAdapter
 
         lifecycleScope.launchWhenCreated {
             viewModel.data.collectLatest {
@@ -86,13 +93,11 @@ class FeedFragment : Fragment() {
         lifecycleScope.launchWhenCreated {
             adapter.loadStateFlow.collectLatest { loadState ->
                 binding.swiprefresh.isRefreshing = loadState.refresh is LoadState.Loading
+                val isError = loadState.refresh is LoadState.Error
+                binding.errorGroup.isVisible = isError
 
-                val errorState = loadState.refresh as? LoadState.Error
-                    ?: loadState.append as? LoadState.Error
-                    ?: loadState.prepend as? LoadState.Error
-
-                errorState?.let {
-                    Toast.makeText(requireContext(), "Ошибка загрузки", Toast.LENGTH_SHORT).show()
+                if (isError) {
+                    binding.retryButton.setOnClickListener { adapter.retry() }
                 }
             }
         }

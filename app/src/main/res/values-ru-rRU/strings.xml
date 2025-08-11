@@ -15,4 +15,5 @@
     <string name="retry_loading">Повторить загрузку</string>
     <string name="empty_posts">Постов нет</string>
     <string name="google_play_unavailable">Службы гугл не доступны</string>
+
 </resources>
