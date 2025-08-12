@@ -12,7 +12,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.ConcatAdapter
-import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import ru.netology.nmedia.R
@@ -78,9 +77,10 @@ class FeedFragment : Fragment() {
             }
         })
 
-        val headerAdapter = PostsLoadStateAdapter { adapter.retry() }
-        val footerAdapter = PostsLoadStateAdapter { adapter.retry() }
-        val concatAdapter = ConcatAdapter(headerAdapter, adapter, footerAdapter)
+        val concatAdapter = adapter.withLoadStateHeaderAndFooter(
+            header = PostsLoadStateAdapter { adapter.retry() },
+            footer = PostsLoadStateAdapter { adapter.retry() }
+        )
 
         binding.list.adapter = concatAdapter
 
@@ -93,6 +93,7 @@ class FeedFragment : Fragment() {
         lifecycleScope.launchWhenCreated {
             adapter.loadStateFlow.collectLatest { loadState ->
                 binding.swiprefresh.isRefreshing = loadState.refresh is LoadState.Loading
+
                 val isError = loadState.refresh is LoadState.Error
                 binding.errorGroup.isVisible = isError
 

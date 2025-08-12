@@ -177,6 +177,10 @@ class PostsLoadStateAdapter(
                 progressBar.isVisible = loadState is LoadState.Loading
                 retryButton.isVisible = loadState is LoadState.Error
                 errorText.isVisible = loadState is LoadState.Error
+
+                if (loadState is LoadState.Error) {
+                    errorText.text = loadState.error.localizedMessage
+                }
             }
         }
     }
